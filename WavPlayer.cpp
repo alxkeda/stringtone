@@ -67,6 +67,7 @@ using namespace daisy;
 // ═════════════════════════════════════════════════════════════════════════════
 
 static constexpr int   STARTUP_DELAY_MS = 1000;
+static constexpr int   BASELINE_FACTOR = 5; // Delay multiplier for baseline reads, to ensure the sensors have stabilised after changing MUX address
 static constexpr int   NUM_COLS       = 8;
 static constexpr int   NUM_ROWS       = 8;
 static constexpr int   WAVETABLE_SIZE = 2048;   // samples per waveform period, linear interpolation between 
@@ -79,7 +80,7 @@ static constexpr float SUPPLY_VOLTS   = 3.3f;   // ADC reference voltage
 // Crossfade length in samples.  At 48 kHz this is ≈ 2.7 ms — long enough to
 // suppress any discontinuity click, short enough to be imperceptible as lag.
 // Must be shorter than one full scan cycle (≈ 9.6 ms at kScanDelayUs = 150).
-static constexpr int   CROSSFADE_LEN  = 10;
+static constexpr int   CROSSFADE_LEN  = 500;
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  User-adjustable parameters
@@ -87,19 +88,19 @@ static constexpr int   CROSSFADE_LEN  = 10;
 
 static float baseline[NUM_COLS][NUM_ROWS];
 
-static float    kNoiseFloor     = 0.007f;   // |deviation| below which a sensor is ignored (V)
-static float    kPosDead        = 0.10f;    // Dead-zone for centroid hysteresis (row units)
+static float    kNoiseFloor     = 0.040f;   // |deviation| below which a sensor is ignored (V)
+static float    kPosDead        = 0.01f;    // Dead-zone for centroid hysteresis (row units)
 static float    kSmooth         = 1.0f;     // Smoothing coefficient  [0=frozen, 1=instant]
-static float    kSplineTension  = 1.0f;     // Tension parameter for Catmull-Rom spline (0 = standard, 1 = linear)
+static float    kSplineTension  = 0.0f;     // Tensiopn parameter for Catmull-Rom spline (0 = standard, 1 = linear)
 
-static uint32_t kScanDelayUs = 200;    // µs to wait after changing MUX address
+static uint32_t kScanDelayUs = 100;    // µs to wait after changing MUX address
 
-static bool     kDebugStep      = true;
-static bool     kDebugDisplay   = false;
+static bool     kDebugStep      = false;
+static bool     kDebugDisplay   = true;
 static bool     kDebugParams    = false;
-static uint32_t kDebugDelayMs   = 2000;
+static uint32_t kDebugDelayMs   = 100;
 
-static float    kPlayFrequency  = 200.0f; // Hz — A3 by default
+static float    kPlayFrequency  = 80.0f; // Hz — A3 by default
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  Hardware objects
@@ -337,7 +338,7 @@ int main()
 {
     hw.Init();
     hw.SetAudioBlockSize(64);
-    hw.StartLog(true);
+    hw.StartLog(false);
 
     System::Delay(STARTUP_DELAY_MS); // Startup delay to allow the power supply to stabilise for the OLED
 
@@ -418,12 +419,12 @@ int main()
             GetMuxAddrs(c, r, sel_addr, ch_addr);
             SetSelectorAddr(sel_addr);
             SetChannelAddr(ch_addr);
-            System::DelayUs(100 * kScanDelayUs);
+            System::DelayUs(BASELINE_FACTOR * kScanDelayUs);
 
             float acc = 0.0f;
             for (int s = 0; s < CAL_SAMPLES; s++) {
                 acc += hw.adc.GetFloat(0) * SUPPLY_VOLTS;
-                System::DelayUs(100 * kScanDelayUs);
+                System::DelayUs(BASELINE_FACTOR * kScanDelayUs);
             }
             baseline[c][r] = acc / static_cast<float>(CAL_SAMPLES);
 
