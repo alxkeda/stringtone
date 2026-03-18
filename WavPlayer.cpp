@@ -53,8 +53,8 @@
 
 // Install libDaisy here: https://daisy.audio/tutorials/cpp-dev-env/
 #include <daisy_seed.h>
-#include <oled_ssd130x.h>
-#include <i2c.h>
+#include <dev/oled_ssd130x.h>
+#include <per/i2c.h>
 
 #include <algorithm>   // std::clamp
 #include <cmath>       // std::abs, std::fabsf
@@ -66,7 +66,7 @@ using namespace daisy;
 //  Constants  (do not change at runtime)
 // ═════════════════════════════════════════════════════════════════════════════
 
-static constexpr int   STARTUP_DELAY_MS = 500;
+static constexpr int   STARTUP_DELAY_MS = 1000;
 static constexpr int   NUM_COLS       = 8;
 static constexpr int   NUM_ROWS       = 8;
 static constexpr int   WAVETABLE_SIZE = 2048;   // samples per waveform period, linear interpolation between 
@@ -79,7 +79,7 @@ static constexpr float SUPPLY_VOLTS   = 3.3f;   // ADC reference voltage
 // Crossfade length in samples.  At 48 kHz this is ≈ 2.7 ms — long enough to
 // suppress any discontinuity click, short enough to be imperceptible as lag.
 // Must be shorter than one full scan cycle (≈ 9.6 ms at kScanDelayUs = 150).
-static constexpr int   CROSSFADE_LEN  = 128;
+static constexpr int   CROSSFADE_LEN  = 10;
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  User-adjustable parameters
@@ -87,19 +87,19 @@ static constexpr int   CROSSFADE_LEN  = 128;
 
 static float baseline[NUM_COLS][NUM_ROWS];
 
-static float    kNoiseFloor     = 0.025f;   // |deviation| below which a sensor is ignored (V)
+static float    kNoiseFloor     = 0.007f;   // |deviation| below which a sensor is ignored (V)
 static float    kPosDead        = 0.10f;    // Dead-zone for centroid hysteresis (row units)
 static float    kSmooth         = 1.0f;     // Smoothing coefficient  [0=frozen, 1=instant]
-static float    kSplineTension  = 0.0f;     // Tension parameter for Catmull-Rom spline (0 = standard, 1 = linear)
+static float    kSplineTension  = 1.0f;     // Tension parameter for Catmull-Rom spline (0 = standard, 1 = linear)
 
-static uint32_t kScanDelayUs = 150;    // µs to wait after changing MUX address
+static uint32_t kScanDelayUs = 200;    // µs to wait after changing MUX address
 
 static bool     kDebugStep      = true;
 static bool     kDebugDisplay   = false;
 static bool     kDebugParams    = false;
-static uint32_t kDebugDelayMs   = 50;
+static uint32_t kDebugDelayMs   = 2000;
 
-static float    kPlayFrequency  = 220.0f; // Hz — A3 by default
+static float    kPlayFrequency  = 200.0f; // Hz — A3 by default
 
 // ═════════════════════════════════════════════════════════════════════════════
 //  Hardware objects
@@ -410,6 +410,7 @@ int main()
     //  Averages CAL_SAMPLES reads per sensor at power-on.
     //  Ensure no magnets are near the array during this window.
     //  In the future, add a button to retare the instrument wihtout needing to reboot it
+    hw.PrintLine("Calibrating...");
     static constexpr int CAL_SAMPLES = 16;
     for (int c = 0; c < NUM_COLS; c++) {
         for (int r = 0; r < NUM_ROWS; r++) {
@@ -417,26 +418,31 @@ int main()
             GetMuxAddrs(c, r, sel_addr, ch_addr);
             SetSelectorAddr(sel_addr);
             SetChannelAddr(ch_addr);
-            System::DelayUs(kScanDelayUs);
+            System::DelayUs(100 * kScanDelayUs);
 
             float acc = 0.0f;
             for (int s = 0; s < CAL_SAMPLES; s++) {
                 acc += hw.adc.GetFloat(0) * SUPPLY_VOLTS;
-                System::DelayUs(kScanDelayUs);
+                System::DelayUs(100 * kScanDelayUs);
             }
             baseline[c][r] = acc / static_cast<float>(CAL_SAMPLES);
+
         }
     }
     hw.PrintLine("Calibration done.");
 
     hw.StartAudio(AudioCallback);
-    hw.PrintLine("Stringtone ready. kDebugStep=%d  kPlayFrequency=%.1f Hz",
-                 (int)kDebugStep, static_cast<double>(kPlayFrequency));
+    hw.PrintLine("Stringtone ready. kDebugStep=%d  kPlayFrequency=%d.%01d Hz",
+        (int)kDebugStep,
+        (int)kPlayFrequency,
+        (int)(kPlayFrequency * 10) % 10);
 
     // ═════════════════════════════════════════════════════════════════════════
     //  Main scan loop
     //  Each iteration: scan 64 sensors → compute positions → build wavetable
     // ═════════════════════════════════════════════════════════════════════════
+
+    float normalized = 0;
 
     while (true) {
 
@@ -452,14 +458,17 @@ int main()
                 SetChannelAddr(ch_addr);
                 System::DelayUs(kScanDelayUs);
 
-                sensor_v[c][r] = hw.adc.GetFloat(0) * SUPPLY_VOLTS;
+                normalized = hw.adc.GetFloat(0);
+                sensor_v[c][r] = normalized * SUPPLY_VOLTS;
 
                 if (kDebugStep) { // This prints while the sensor scan occurs
                     hw.PrintLine( // Should fix output since float print is not enabled on the Daisy Seed by default
-                        "[C%d R%d] sel=%u ch=%u  %d.%04d V  dev=%c%d.%04d V",
+                        "[C%d R%d] sel=%u ch=%u  %d.%04d (norm)  %d.%04d V  dev=%c%d.%04d V",
                         c, r,
                         static_cast<unsigned>(sel_addr),
                         static_cast<unsigned>(ch_addr),
+                        (int)normalized,
+                        (int)(normalized * 10000) % 10000,
                         (int)sensor_v[c][r],
                         (int)(fabsf(sensor_v[c][r]) * 10000) % 10000,
                         (sensor_v[c][r] - baseline[c][r] >= 0) ? '+' : '-',
@@ -493,9 +502,12 @@ int main()
         if (kDebugStep) {
             hw.Print("Positions: ");
             for (int c = 0; c < NUM_COLS; c++)
-                hw.Print("%.2f ", static_cast<double>(col_pos_smooth[c]));
+                hw.Print("%c%d.%02d ",
+                    col_pos_smooth[c] < 0 ? '-' : ' ',
+                    (int)fabsf(col_pos_smooth[c]),
+                    (int)(fabsf(col_pos_smooth[c]) * 100) % 100);
             hw.PrintLine("");
-            System::Delay(1);
+            System::Delay(kDebugDelayMs);
         }
 
         // Displaying positions if kDebugDisplay is enabled and the display initialized successfully
