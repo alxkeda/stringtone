@@ -1,9 +1,14 @@
+// #define DEBUG
+
+#include "math.h"
+
 #include "adafruit_tft/ili9341.hpp"
 #include "adafruit_tft/fonts.h"
 
 #include "daisy_seed.h"
 #include "per/spi.h"
 #include "per/i2c.h"
+#include "per/qspi.h"
 
 using namespace daisy;
 using namespace daisy::seed;
@@ -31,10 +36,10 @@ void SPI_Init(void) {
     spi_conf.periph          = daisy::SpiHandle::Config::Peripheral::SPI_1;
     spi_conf.mode            = daisy::SpiHandle::Config::Mode::MASTER;
     spi_conf.direction       = daisy::SpiHandle::Config::Direction::TWO_LINES;
-    spi_conf.clock_polarity  = daisy::SpiHandle::Config::ClockPolarity::HIGH;
+    spi_conf.clock_polarity  = daisy::SpiHandle::Config::ClockPolarity::LOW;
     spi_conf.clock_phase     = daisy::SpiHandle::Config::ClockPhase::ONE_EDGE;
     spi_conf.nss             = daisy::SpiHandle::Config::NSS::SOFT;
-    spi_conf.baud_prescaler  = daisy::SpiHandle::Config::BaudPrescaler::PS_32;
+    spi_conf.baud_prescaler  = daisy::SpiHandle::Config::BaudPrescaler::PS_2;
     spi_conf.datasize        = 8;
 
     spi_conf.pin_config.sclk = {DSY_GPIOG, 11};  // pin 9  D8
@@ -57,27 +62,104 @@ void I2C_Init(void) {
 int main(void) {
 
     hw.Init();
+
+    // QSPIHandle::Config qspi_config = {
+    //     .device = QSPIHandle::Config::Device::IS25LP064A,
+    //     .mode = QSPIHandle::Config::Mode::MEMORY_MAPPED
+    // };
+    // hw.qspi.Init(qspi_config);
+
+    #ifdef DEBUG
     hw.StartLog(true);
     hw.PrintLine("=== boot complete ===");
+    #endif
 
     SPI_Init();
 
+    #ifdef DEBUG
     hw.PrintLine("=== spi init complete ===");
+    #endif
 
     GPIO_Init();
 
+    #ifdef DEBUG
     hw.PrintLine("=== gpio init complete ===");
+    #endif
 
     ILI9341_Unselect();
     ILI9341_Init();
 
+    #ifdef DEBUG
     hw.PrintLine("=== ili9341 init complete ===");
+    #endif
+    ILI9341_Select();
+    ILI9341_FillScreen_Raw(ILI9341_WHITE);
+    ILI9341_Unselect();
+    hw.DelayMs(1000);
+    ILI9341_Select();
+    ILI9341_FillScreen_Raw(ILI9341_BLACK);
+    ILI9341_Unselect();
 
-    ILI9341_FillScreen(ILI9341_BLACK);
-    ILI9341_WriteString(10, 10, "Stringtone", Adafruit_TFT_Font_11x18, ILI9341_WHITE, ILI9341_BLACK);
-
+    #ifdef DEBUG
     hw.PrintLine("=== ili9341 fill complete ===");
+    #endif
 
-    while (1) {
+    hw.DelayMs(1000);
+
+    // ── Standing Wave Setup ──────────────────────────────────────────────────
+    static const int   WAVE_CY    = ILI9341_HEIGHT / 2;            // 160
+    static const int   WAVE_AMP   = 55;                             // px amplitude
+    static const float WAVE_K     = (2.0f * 3.14159265f * 2.5f)   // 2.5 cycles
+                                    / (float)ILI9341_WIDTH;
+    static const float WAVE_OMEGA = 0.07f;                          // temporal speed
+    static const int   WAVE_THICK = 2;                              // half-thickness → 5px band
+
+    uint16_t prev_y[ILI9341_WIDTH];
+    for(int i = 0; i < ILI9341_WIDTH; i++)
+        prev_y[i] = (uint16_t)WAVE_CY;
+
+    float wave_t = 0.0f;
+
+    ILI9341_Select();   // ← assert CS ONCE for the entire frame
+    while(1) {
+
+        for(int x = 0; x < ILI9341_WIDTH; x++) {
+
+            int ny = WAVE_CY + (int)(WAVE_AMP
+                     * sinf(WAVE_K * (float)x)
+                     * cosf(WAVE_OMEGA * wave_t));
+
+            // clamp so the glow band stays on-screen
+            if(ny < WAVE_THICK)                        ny = WAVE_THICK;
+            if(ny > ILI9341_HEIGHT - WAVE_THICK - 1)  ny = ILI9341_HEIGHT - WAVE_THICK - 1;
+
+            uint16_t new_y = (uint16_t)ny;
+
+            if(new_y != prev_y[x]) {
+
+                // erase old band — single SetAddressWindow + burst fill
+                ILI9341_FillRectangle_Raw(
+                    (uint16_t)x,
+                    (uint16_t)(prev_y[x] - WAVE_THICK),
+                    1,
+                    (uint16_t)(2 * WAVE_THICK + 1),
+                    ILI9341_BLACK
+                );
+
+                // draw new band — bright centre, softer glow edges
+                ILI9341_DrawPixel_Raw((uint16_t)x, new_y - WAVE_THICK, ILI9341_BLUE);
+                ILI9341_DrawPixel_Raw((uint16_t)x, new_y - 1,          ILI9341_CYAN);
+                ILI9341_DrawPixel_Raw((uint16_t)x, new_y,              ILI9341_WHITE);
+                ILI9341_DrawPixel_Raw((uint16_t)x, new_y + 1,          ILI9341_CYAN);
+                ILI9341_DrawPixel_Raw((uint16_t)x, new_y + WAVE_THICK, ILI9341_BLUE);
+
+                prev_y[x] = new_y;
+            }
+        }
+
+        wave_t += 1.0f;
     }
+
+    ILI9341_Unselect();  // ← release CS ONCE after the entire frame
+
 }

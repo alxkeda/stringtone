@@ -2,9 +2,7 @@
 #include "stm32h7xx_hal.h"
 #include "ili9341.hpp"
 
-uint8_t DMA_BUFFER_MEM_SECTION buffer[16];
-
-static void ILI9341_Select() {
+void ILI9341_Select() {
     gpio_cs.Write(false);
 }
 
@@ -20,29 +18,12 @@ static void ILI9341_Reset() {
 
 static void ILI9341_WriteCommand(uint8_t cmd) {
     gpio_dc.Write(false);
-    buffer[0] = cmd;
-    spi_handle.DmaTransmit(buffer, sizeof(cmd), NULL, NULL, NULL);
+    spi_handle.BlockingTransmit(&cmd, sizeof(cmd));
 }
 
 static void ILI9341_WriteData(uint8_t* buff, size_t buff_size) {
     gpio_dc.Write(true);
-
-    size_t buffer_size = sizeof(buffer);
-
-    // Split buff data into chunks that fit into the fixed size DMA buffer
-    if (buff_size > buffer_size) {
-        while(buff_size > 0) {
-            uint16_t chunk_size = buff_size > buffer_size ? buffer_size : buff_size;
-            memcpy(buffer, buff, chunk_size);
-            spi_handle.DmaTransmit(buffer, chunk_size, NULL, NULL, NULL);
-            buff += chunk_size;
-            buff_size -= chunk_size;
-        }
-    } else {
-        memcpy(buffer, buff, buff_size);
-        spi_handle.DmaTransmit(buffer, buff_size, NULL, NULL, NULL);
-    }
-
+    spi_handle.BlockingTransmit(buff, buff_size);
 }
 
 static void ILI9341_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
@@ -232,6 +213,15 @@ void ILI9341_DrawPixel(uint16_t x, uint16_t y, uint16_t color) {
     ILI9341_Unselect();
 }
 
+void ILI9341_DrawPixel_Raw(uint16_t x, uint16_t y, uint16_t color) {
+    if((x >= ILI9341_WIDTH) || (y >= ILI9341_HEIGHT))
+        return;
+
+    ILI9341_SetAddressWindow(x, y, x+1, y+1);
+    uint8_t data[] = { color >> 8, color & 0xFF };
+    ILI9341_WriteData(data, sizeof(data));
+}
+
 static void ILI9341_WriteChar(uint16_t x, uint16_t y, char ch, Adafruit_TFT_FontDef font, uint16_t color, uint16_t bgcolor) {
     uint32_t i, b, j;
 
@@ -297,8 +287,42 @@ void ILI9341_FillRectangle(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint1
     ILI9341_Unselect();
 }
 
+// Like ILI9341_FillRectangle but assumes CS is already asserted.
+// Uses a stack buffer to burst the entire rectangle in one SPI write.
+void ILI9341_FillRectangle_Raw(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
+    if((x >= ILI9341_WIDTH) || (y >= ILI9341_HEIGHT)) return;
+    if((x + w - 1) >= ILI9341_WIDTH) w = ILI9341_WIDTH - x;
+    if((y + h - 1) >= ILI9341_HEIGHT) h = ILI9341_HEIGHT - y;
+
+    ILI9341_SetAddressWindow(x, y, x + w - 1, y + h - 1);
+
+    const uint32_t  total_pixels = (uint32_t)w * h;
+    const uint8_t   hi           = color >> 8;
+    const uint8_t   lo           = color & 0xFF;
+
+    // 256-byte chunk buffer — large enough for a full 128-pixel burst
+    static uint8_t buf[256];
+    for(uint32_t i = 0; i < sizeof(buf); i += 2) {
+        buf[i]     = hi;
+        buf[i + 1] = lo;
+    }
+
+    gpio_dc.Write(true);
+
+    uint32_t remaining = total_pixels * 2;   // bytes
+    while(remaining > 0) {
+        uint32_t chunk = (remaining > sizeof(buf)) ? sizeof(buf) : remaining;
+        spi_handle.BlockingTransmit(buf, chunk);
+        remaining -= chunk;
+    }
+}
+
 void ILI9341_FillScreen(uint16_t color) {
     ILI9341_FillRectangle(0, 0, ILI9341_WIDTH, ILI9341_HEIGHT, color);
+}
+
+void ILI9341_FillScreen_Raw(uint16_t color) {
+    ILI9341_FillRectangle_Raw(0, 0, ILI9341_WIDTH, ILI9341_HEIGHT, color);
 }
 
 void ILI9341_DrawImage(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t* data) {
