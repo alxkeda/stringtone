@@ -93,7 +93,7 @@ build/main.o: main.cpp \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_hcd.h \
- adafruit_tft/ili9341.hpp adafruit_tft/fonts.h \
+ touchscreen/ili9341.hpp touchscreen/fonts.h \
  ../../DaisySeed/DaisyExamples/libDaisy/src/daisy_seed.h \
  ../../DaisySeed/DaisyExamples/libDaisy/src/daisy.h \
  ../../DaisySeed/DaisyExamples/libDaisy/src/daisy_core.h \
@@ -180,7 +180,7 @@ build/main.o: main.cpp \
  ../../DaisySeed/DaisyExamples/libDaisy/src/util/WaveTableLoader.h \
  ../../DaisySeed/DaisyExamples/libDaisy/src/sys/fatfs.h \
  ../../DaisySeed/DaisyExamples/libDaisy/src/util/WavWriter.h \
- adafruit_tft/fonts.h
+ touchscreen/fonts.h touchscreen/ft6206.hpp
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h:
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h:
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Include/core_cm7.h:
@@ -275,8 +275,8 @@ build/main.o: main.cpp \
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h:
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h:
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_hcd.h:
-adafruit_tft/ili9341.hpp:
-adafruit_tft/fonts.h:
+touchscreen/ili9341.hpp:
+touchscreen/fonts.h:
 ../../DaisySeed/DaisyExamples/libDaisy/src/daisy_seed.h:
 ../../DaisySeed/DaisyExamples/libDaisy/src/daisy.h:
 ../../DaisySeed/DaisyExamples/libDaisy/src/daisy_core.h:
@@ -363,4 +363,5 @@ adafruit_tft/fonts.h:
 ../../DaisySeed/DaisyExamples/libDaisy/src/util/WaveTableLoader.h:
 ../../DaisySeed/DaisyExamples/libDaisy/src/sys/fatfs.h:
 ../../DaisySeed/DaisyExamples/libDaisy/src/util/WavWriter.h:
-adafruit_tft/fonts.h:
+touchscreen/fonts.h:
+touchscreen/ft6206.hpp:

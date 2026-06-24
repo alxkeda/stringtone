@@ -1,0 +1,505 @@
+ARM GAS  /var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 2
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"ft6206.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.section	.text._Z17FT6206_Is_Pressedv,"ax",%progbits
+  19              		.align	1
+  20              		.p2align 2,,3
+  21              		.global	_Z17FT6206_Is_Pressedv
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_Z17FT6206_Is_Pressedv:
+  27              	.LFB4482:
+  28              		.file 1 "touchscreen/ft6206.cpp"
+   1:touchscreen/ft6206.cpp **** // TODO:    Replace all memory addresses with macros describing the memory address
+   2:touchscreen/ft6206.cpp **** //          Change nsamples to a macro in the header 
+   3:touchscreen/ft6206.cpp **** 
+   4:touchscreen/ft6206.cpp **** #include "ft6206.hpp"
+   5:touchscreen/ft6206.cpp **** 
+   6:touchscreen/ft6206.cpp **** #define READ_X 0xD0
+   7:touchscreen/ft6206.cpp **** #define READ_Y 0x90
+   8:touchscreen/ft6206.cpp **** 
+   9:touchscreen/ft6206.cpp **** bool FT6206_Is_Pressed() {
+  29              		.loc 1 9 26 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  10:touchscreen/ft6206.cpp ****     return gpio_irq.Read() == false;
+  33              		.loc 1 10 5 view .LVU1
+   9:touchscreen/ft6206.cpp ****     return gpio_irq.Read() == false;
+  34              		.loc 1 9 26 is_stmt 0 view .LVU2
+  35 0000 08B5     		push	{r3, lr}
+  36              		.cfi_def_cfa_offset 8
+  37              		.cfi_offset 3, -8
+  38              		.cfi_offset 14, -4
+  39              		.loc 1 10 25 view .LVU3
+  40 0002 0348     		ldr	r0, .L4
+  41 0004 FFF7FEFF 		bl	_ZN5daisy4GPIO4ReadEv
+  42              	.LVL0:
+  43              		.loc 1 10 31 view .LVU4
+  44 0008 80F00100 		eor	r0, r0, #1
+  11:touchscreen/ft6206.cpp **** }
+  45              		.loc 1 11 1 view .LVU5
+  46 000c C0B2     		uxtb	r0, r0
+ARM GAS  /var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s 			page 2
+
+
+  47 000e 08BD     		pop	{r3, pc}
+  48              	.L5:
+  49              		.align	2
+  50              	.L4:
+  51 0010 00000000 		.word	gpio_irq
+  52              		.cfi_endproc
+  53              	.LFE4482:
+  55              		.section	.text._Z26FT6206_TouchGetCoordinatesPtS_,"ax",%progbits
+  56              		.align	1
+  57              		.p2align 2,,3
+  58              		.global	_Z26FT6206_TouchGetCoordinatesPtS_
+  59              		.syntax unified
+  60              		.thumb
+  61              		.thumb_func
+  63              	_Z26FT6206_TouchGetCoordinatesPtS_:
+  64              	.LVL1:
+  65              	.LFB4483:
+  12:touchscreen/ft6206.cpp **** 
+  13:touchscreen/ft6206.cpp **** bool FT6206_TouchGetCoordinates(uint16_t* x, uint16_t* y) {
+  66              		.loc 1 13 59 is_stmt 1 view -0
+  67              		.cfi_startproc
+  68              		@ args = 0, pretend = 0, frame = 8
+  69              		@ frame_needed = 0, uses_anonymous_args = 0
+  14:touchscreen/ft6206.cpp ****     static const uint8_t cmd_read_x[] = { READ_X };
+  70              		.loc 1 14 5 view .LVU7
+  15:touchscreen/ft6206.cpp ****     static const uint8_t cmd_read_y[] = { READ_Y };
+  71              		.loc 1 15 5 view .LVU8
+  16:touchscreen/ft6206.cpp ****     static const uint8_t zeroes_tx[] = { 0x00, 0x00 };
+  72              		.loc 1 16 5 view .LVU9
+  17:touchscreen/ft6206.cpp **** 
+  18:touchscreen/ft6206.cpp ****     uint32_t avg_x = 0;
+  73              		.loc 1 18 5 view .LVU10
+  19:touchscreen/ft6206.cpp ****     uint32_t avg_y = 0;
+  74              		.loc 1 19 5 view .LVU11
+  20:touchscreen/ft6206.cpp ****     uint8_t nsamples = 0;
+  75              		.loc 1 20 5 view .LVU12
+  21:touchscreen/ft6206.cpp ****     for(uint8_t i = 0; i < 16; i++) {
+  76              		.loc 1 21 5 view .LVU13
+  77              	.LBB6:
+  78              		.loc 1 21 26 view .LVU14
+  79              	.LBE6:
+  13:touchscreen/ft6206.cpp ****     static const uint8_t cmd_read_x[] = { READ_X };
+  80              		.loc 1 13 59 is_stmt 0 view .LVU15
+  81 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+  82              		.cfi_def_cfa_offset 32
+  83              		.cfi_offset 4, -32
+  84              		.cfi_offset 5, -28
+  85              		.cfi_offset 6, -24
+  86              		.cfi_offset 7, -20
+  87              		.cfi_offset 8, -16
+  88              		.cfi_offset 9, -12
+  89              		.cfi_offset 10, -8
+  90              		.cfi_offset 14, -4
+  19:touchscreen/ft6206.cpp ****     uint8_t nsamples = 0;
+  91              		.loc 1 19 14 view .LVU16
+  92 0004 0025     		movs	r5, #0
+  13:touchscreen/ft6206.cpp ****     static const uint8_t cmd_read_x[] = { READ_X };
+ARM GAS  /var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s 			page 3
+
+
+  93              		.loc 1 13 59 view .LVU17
+  94 0006 84B0     		sub	sp, sp, #16
+  95              		.cfi_def_cfa_offset 48
+  13:touchscreen/ft6206.cpp ****     static const uint8_t cmd_read_x[] = { READ_X };
+  96              		.loc 1 13 59 view .LVU18
+  97 0008 4FF01009 		mov	r9, #16
+  98 000c 8246     		mov	r10, r0
+  99 000e 8846     		mov	r8, r1
+  18:touchscreen/ft6206.cpp ****     uint32_t avg_y = 0;
+ 100              		.loc 1 18 14 view .LVU19
+ 101 0010 2E46     		mov	r6, r5
+ 102              	.LVL2:
+ 103              	.L9:
+ 104              	.LBB16:
+ 105              	.LBB7:
+  22:touchscreen/ft6206.cpp ****         if(!FT6206_Is_Pressed())
+ 106              		.loc 1 22 9 is_stmt 1 view .LVU20
+ 107              	.LBB8:
+ 108              	.LBI8:
+   9:touchscreen/ft6206.cpp ****     return gpio_irq.Read() == false;
+ 109              		.loc 1 9 6 view .LVU21
+ 110              	.LBB9:
+  10:touchscreen/ft6206.cpp **** }
+ 111              		.loc 1 10 5 view .LVU22
+  10:touchscreen/ft6206.cpp **** }
+ 112              		.loc 1 10 25 is_stmt 0 view .LVU23
+ 113 0012 3748     		ldr	r0, .L20
+ 114              	.LBE9:
+ 115              	.LBE8:
+  23:touchscreen/ft6206.cpp ****             break;
+  24:touchscreen/ft6206.cpp **** 
+  25:touchscreen/ft6206.cpp ****         nsamples++;
+  26:touchscreen/ft6206.cpp **** 
+  27:touchscreen/ft6206.cpp ****         i2c_handle.TransmitBlocking(FT6206_ADDR, (uint8_t*)cmd_read_y, sizeof(cmd_read_y), FT6206_T
+ 116              		.loc 1 27 36 view .LVU24
+ 117 0014 4FF0FF34 		mov	r4, #-1
+ 118              	.LBB12:
+ 119              	.LBB10:
+  10:touchscreen/ft6206.cpp **** }
+ 120              		.loc 1 10 25 view .LVU25
+ 121 0018 FFF7FEFF 		bl	_ZN5daisy4GPIO4ReadEv
+ 122              	.LVL3:
+ 123              	.LBE10:
+ 124              	.LBE12:
+  25:touchscreen/ft6206.cpp **** 
+ 125              		.loc 1 25 9 is_stmt 1 view .LVU26
+ 126              		.loc 1 27 9 view .LVU27
+ 127              	.LBB13:
+ 128              	.LBB11:
+  10:touchscreen/ft6206.cpp **** }
+ 129              		.loc 1 10 25 is_stmt 0 view .LVU28
+ 130 001c 0746     		mov	r7, r0
+ 131              	.LBE11:
+ 132              	.LBE13:
+ 133              		.loc 1 27 36 view .LVU29
+ 134 001e 0123     		movs	r3, #1
+ 135 0020 344A     		ldr	r2, .L20+4
+ARM GAS  /var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s 			page 4
+
+
+ 136 0022 7021     		movs	r1, #112
+ 137 0024 3448     		ldr	r0, .L20+8
+  22:touchscreen/ft6206.cpp ****             break;
+ 138              		.loc 1 22 9 view .LVU30
+ 139 0026 002F     		cmp	r7, #0
+ 140 0028 5ED1     		bne	.L7
+ 141              		.loc 1 27 36 view .LVU31
+ 142 002a 0094     		str	r4, [sp]
+ 143 002c FFF7FEFF 		bl	_ZN5daisy9I2CHandle16TransmitBlockingEtPhtm
+ 144              	.LVL4:
+  28:touchscreen/ft6206.cpp ****         uint8_t y_raw[2];
+ 145              		.loc 1 28 9 is_stmt 1 view .LVU32
+  29:touchscreen/ft6206.cpp ****         i2c_handle.ReceiveBlocking(FT6206_ADDR, y_raw, sizeof(y_raw), FT6206_TIMEOUT);
+ 146              		.loc 1 29 9 view .LVU33
+ 147              		.loc 1 29 35 is_stmt 0 view .LVU34
+ 148 0030 0223     		movs	r3, #2
+ 149 0032 02AA     		add	r2, sp, #8
+ 150 0034 7021     		movs	r1, #112
+ 151 0036 3048     		ldr	r0, .L20+8
+ 152 0038 0094     		str	r4, [sp]
+ 153 003a FFF7FEFF 		bl	_ZN5daisy9I2CHandle15ReceiveBlockingEtPhtm
+ 154              	.LVL5:
+  30:touchscreen/ft6206.cpp **** 
+  31:touchscreen/ft6206.cpp ****         i2c_handle.TransmitBlocking(FT6206_ADDR, (uint8_t*)cmd_read_x, sizeof(cmd_read_x), FT6206_T
+ 155              		.loc 1 31 9 is_stmt 1 view .LVU35
+ 156              		.loc 1 31 36 is_stmt 0 view .LVU36
+ 157 003e 0123     		movs	r3, #1
+ 158 0040 2E4A     		ldr	r2, .L20+12
+ 159 0042 7021     		movs	r1, #112
+ 160 0044 2C48     		ldr	r0, .L20+8
+ 161 0046 0094     		str	r4, [sp]
+ 162 0048 FFF7FEFF 		bl	_ZN5daisy9I2CHandle16TransmitBlockingEtPhtm
+ 163              	.LVL6:
+  32:touchscreen/ft6206.cpp ****         uint8_t x_raw[2];
+ 164              		.loc 1 32 9 is_stmt 1 view .LVU37
+  33:touchscreen/ft6206.cpp ****         i2c_handle.ReceiveBlocking(FT6206_ADDR, x_raw, sizeof(x_raw), FT6206_TIMEOUT);
+ 165              		.loc 1 33 9 view .LVU38
+ 166              		.loc 1 33 35 is_stmt 0 view .LVU39
+ 167 004c 0223     		movs	r3, #2
+ 168 004e 03AA     		add	r2, sp, #12
+ 169 0050 7021     		movs	r1, #112
+ 170 0052 2948     		ldr	r0, .L20+8
+ 171 0054 0094     		str	r4, [sp]
+ 172 0056 FFF7FEFF 		bl	_ZN5daisy9I2CHandle15ReceiveBlockingEtPhtm
+ 173              	.LVL7:
+  34:touchscreen/ft6206.cpp **** 
+  35:touchscreen/ft6206.cpp ****         avg_x += (((uint16_t)x_raw[0]) << 8) | ((uint16_t)x_raw[1]);
+ 174              		.loc 1 35 9 is_stmt 1 view .LVU40
+ 175              		.loc 1 35 46 is_stmt 0 view .LVU41
+ 176 005a BDF80C20 		ldrh	r2, [sp, #12]
+  36:touchscreen/ft6206.cpp ****         avg_y += (((uint16_t)y_raw[0]) << 8) | ((uint16_t)y_raw[1]);
+ 177              		.loc 1 36 46 view .LVU42
+ 178 005e BDF80830 		ldrh	r3, [sp, #8]
+ 179              	.LBE7:
+  21:touchscreen/ft6206.cpp ****         if(!FT6206_Is_Pressed())
+ 180              		.loc 1 21 26 view .LVU43
+ 181 0062 09EB0401 		add	r1, r9, r4
+ARM GAS  /var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s 			page 5
+
+
+ 182              	.LBB14:
+  35:touchscreen/ft6206.cpp ****         avg_y += (((uint16_t)y_raw[0]) << 8) | ((uint16_t)y_raw[1]);
+ 183              		.loc 1 35 46 view .LVU44
+ 184 0066 52BA     		rev16	r2, r2
+ 185              		.loc 1 36 46 view .LVU45
+ 186 0068 5BBA     		rev16	r3, r3
+ 187              	.LBE14:
+  21:touchscreen/ft6206.cpp ****         if(!FT6206_Is_Pressed())
+ 188              		.loc 1 21 26 view .LVU46
+ 189 006a 11F0FF09 		ands	r9, r1, #255
+ 190              	.LVL8:
+ 191              	.LBB15:
+  35:touchscreen/ft6206.cpp ****         avg_y += (((uint16_t)y_raw[0]) << 8) | ((uint16_t)y_raw[1]);
+ 192              		.loc 1 35 15 view .LVU47
+ 193 006e 16FA82F6 		uxtah	r6, r6, r2
+ 194              	.LVL9:
+ 195              		.loc 1 36 9 is_stmt 1 view .LVU48
+ 196              		.loc 1 36 15 is_stmt 0 view .LVU49
+ 197 0072 15FA83F5 		uxtah	r5, r5, r3
+ 198              	.LVL10:
+ 199              		.loc 1 36 15 view .LVU50
+ 200              	.LBE15:
+  21:touchscreen/ft6206.cpp ****         if(!FT6206_Is_Pressed())
+ 201              		.loc 1 21 5 is_stmt 1 view .LVU51
+  21:touchscreen/ft6206.cpp ****         if(!FT6206_Is_Pressed())
+ 202              		.loc 1 21 26 view .LVU52
+ 203 0076 CCD1     		bne	.L9
+ 204              	.LBE16:
+  37:touchscreen/ft6206.cpp ****     }
+  38:touchscreen/ft6206.cpp **** 
+  39:touchscreen/ft6206.cpp ****     if(nsamples < 16)
+ 205              		.loc 1 39 5 view .LVU53
+  40:touchscreen/ft6206.cpp ****         return false;
+  41:touchscreen/ft6206.cpp **** 
+  42:touchscreen/ft6206.cpp ****     uint32_t raw_x = (avg_x / 16);
+ 206              		.loc 1 42 5 view .LVU54
+ 207              	.LVL11:
+  43:touchscreen/ft6206.cpp ****     if(raw_x < FT6206_MIN_RAW_X) raw_x = FT6206_MIN_RAW_X;
+ 208              		.loc 1 43 5 view .LVU55
+ 209 0078 45F6BF53 		movw	r3, #23999
+ 210 007c 9E42     		cmp	r6, r3
+ 211 007e 2CD9     		bls	.L15
+  44:touchscreen/ft6206.cpp ****     if(raw_x > FT6206_MAX_RAW_X) raw_x = FT6206_MAX_RAW_X;
+ 212              		.loc 1 44 5 view .LVU56
+  42:touchscreen/ft6206.cpp ****     if(raw_x < FT6206_MIN_RAW_X) raw_x = FT6206_MIN_RAW_X;
+ 213              		.loc 1 42 14 is_stmt 0 view .LVU57
+ 214 0080 3609     		lsrs	r6, r6, #4
+ 215              	.LVL12:
+  45:touchscreen/ft6206.cpp **** 
+  46:touchscreen/ft6206.cpp ****     uint32_t raw_y = (avg_y / 16);
+  47:touchscreen/ft6206.cpp ****     if(raw_y < FT6206_MIN_RAW_Y) raw_y = FT6206_MIN_RAW_Y;
+  48:touchscreen/ft6206.cpp ****     if(raw_y > FT6206_MAX_RAW_Y) raw_y = FT6206_MAX_RAW_Y;
+  49:touchscreen/ft6206.cpp **** 
+  50:touchscreen/ft6206.cpp ****     // Uncomment this line to calibrate touchscreen:
+  51:touchscreen/ft6206.cpp ****     // UART_Printf("raw_x = %d, raw_y = %d\r\n", x, y);
+  52:touchscreen/ft6206.cpp **** 
+  53:touchscreen/ft6206.cpp ****     *x = (raw_x - FT6206_MIN_RAW_X) * FT6206_SCALE_X / (FT6206_MAX_RAW_X - FT6206_MIN_RAW_X);
+ARM GAS  /var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s 			page 6
+
+
+ 216              		.loc 1 53 54 view .LVU58
+ 217 0082 47F61813 		movw	r3, #31000
+ 218 0086 1E49     		ldr	r1, .L20+16
+ 219 0088 9E42     		cmp	r6, r3
+ 220 008a 28BF     		it	cs
+ 221 008c 1E46     		movcs	r6, r3
+ 222              	.LVL13:
+ 223              		.loc 1 53 54 view .LVU59
+ 224 008e 1D4B     		ldr	r3, .L20+20
+ 225 0090 C6EB0616 		rsb	r6, r6, r6, lsl #4
+ 226 0094 01EB0611 		add	r1, r1, r6, lsl #4
+ 227 0098 A3FB0131 		umull	r3, r1, r3, r1
+  47:touchscreen/ft6206.cpp ****     if(raw_y > FT6206_MAX_RAW_Y) raw_y = FT6206_MAX_RAW_Y;
+ 228              		.loc 1 47 5 view .LVU60
+ 229 009c 4CF6BF43 		movw	r3, #52415
+ 230 00a0 9D42     		cmp	r5, r3
+ 231              		.loc 1 53 8 view .LVU61
+ 232 00a2 C1F38F31 		ubfx	r1, r1, #14, #16
+  46:touchscreen/ft6206.cpp ****     if(raw_y < FT6206_MIN_RAW_Y) raw_y = FT6206_MIN_RAW_Y;
+ 233              		.loc 1 46 5 is_stmt 1 view .LVU62
+ 234              	.LVL14:
+  47:touchscreen/ft6206.cpp ****     if(raw_y > FT6206_MAX_RAW_Y) raw_y = FT6206_MAX_RAW_Y;
+ 235              		.loc 1 47 5 view .LVU63
+ 236 00a6 1DD9     		bls	.L14
+ 237              	.LVL15:
+ 238              	.L19:
+  48:touchscreen/ft6206.cpp **** 
+ 239              		.loc 1 48 5 view .LVU64
+  46:touchscreen/ft6206.cpp ****     if(raw_y < FT6206_MIN_RAW_Y) raw_y = FT6206_MIN_RAW_Y;
+ 240              		.loc 1 46 14 is_stmt 0 view .LVU65
+ 241 00a8 2D09     		lsrs	r5, r5, #4
+ 242              	.LVL16:
+  54:touchscreen/ft6206.cpp ****     *y = (raw_y - FT6206_MIN_RAW_Y) * FT6206_SCALE_Y / (FT6206_MAX_RAW_Y - FT6206_MIN_RAW_Y);
+ 243              		.loc 1 54 54 view .LVU66
+ 244 00aa 47F29E53 		movw	r3, #30110
+ 245 00ae 164A     		ldr	r2, .L20+24
+ 246              		.loc 1 54 54 view .LVU67
+ 247 00b0 9D42     		cmp	r5, r3
+ 248 00b2 28BF     		it	cs
+ 249 00b4 1D46     		movcs	r5, r3
+ 250 00b6 154B     		ldr	r3, .L20+28
+ 251 00b8 05EB8505 		add	r5, r5, r5, lsl #2
+ 252 00bc 03EB8513 		add	r3, r3, r5, lsl #6
+ 253 00c0 5B08     		lsrs	r3, r3, #1
+ 254 00c2 A2FB0323 		umull	r2, r3, r2, r3
+ 255              		.loc 1 54 8 view .LVU68
+ 256 00c6 C3F38F23 		ubfx	r3, r3, #10, #16
+ 257              	.L11:
+  53:touchscreen/ft6206.cpp ****     *y = (raw_y - FT6206_MIN_RAW_Y) * FT6206_SCALE_Y / (FT6206_MAX_RAW_Y - FT6206_MIN_RAW_Y);
+ 258              		.loc 1 53 5 is_stmt 1 view .LVU69
+  55:touchscreen/ft6206.cpp **** 
+  56:touchscreen/ft6206.cpp ****     return true;
+ 259              		.loc 1 56 12 is_stmt 0 view .LVU70
+ 260 00ca 0120     		movs	r0, #1
+  53:touchscreen/ft6206.cpp ****     *y = (raw_y - FT6206_MIN_RAW_Y) * FT6206_SCALE_Y / (FT6206_MAX_RAW_Y - FT6206_MIN_RAW_Y);
+ 261              		.loc 1 53 8 view .LVU71
+ 262 00cc AAF80010 		strh	r1, [r10]	@ movhi
+ARM GAS  /var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s 			page 7
+
+
+  54:touchscreen/ft6206.cpp **** 
+ 263              		.loc 1 54 5 is_stmt 1 view .LVU72
+  54:touchscreen/ft6206.cpp **** 
+ 264              		.loc 1 54 8 is_stmt 0 view .LVU73
+ 265 00d0 A8F80030 		strh	r3, [r8]	@ movhi
+ 266              		.loc 1 56 5 is_stmt 1 view .LVU74
+  57:touchscreen/ft6206.cpp **** }...
+ 267              		.loc 1 57 1 is_stmt 0 view .LVU75
+ 268 00d4 04B0     		add	sp, sp, #16
+ 269              		.cfi_remember_state
+ 270              		.cfi_def_cfa_offset 32
+ 271              		@ sp needed
+ 272 00d6 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 273              	.LVL17:
+ 274              	.L15:
+ 275              		.cfi_restore_state
+  47:touchscreen/ft6206.cpp ****     if(raw_y < FT6206_MIN_RAW_Y) raw_y = FT6206_MIN_RAW_Y;
+ 276              		.loc 1 47 5 view .LVU76
+ 277 00da 4CF6BF43 		movw	r3, #52415
+ 278 00de 4946     		mov	r1, r9
+ 279              	.LVL18:
+  46:touchscreen/ft6206.cpp ****     uint32_t raw_y = (avg_y / 16);
+ 280              		.loc 1 46 5 is_stmt 1 view .LVU77
+  47:touchscreen/ft6206.cpp ****     if(raw_y < FT6206_MIN_RAW_Y) raw_y = FT6206_MIN_RAW_Y;
+ 281              		.loc 1 47 5 view .LVU78
+ 282 00e0 9D42     		cmp	r5, r3
+ 283 00e2 E1D8     		bhi	.L19
+ 284              	.LVL19:
+ 285              	.L14:
+  47:touchscreen/ft6206.cpp ****     if(raw_y < FT6206_MIN_RAW_Y) raw_y = FT6206_MIN_RAW_Y;
+ 286              		.loc 1 47 5 is_stmt 0 view .LVU79
+ 287 00e4 0023     		movs	r3, #0
+ 288 00e6 F0E7     		b	.L11
+ 289              	.LVL20:
+ 290              	.L7:
+  39:touchscreen/ft6206.cpp ****     if(nsamples < 16)
+ 291              		.loc 1 39 5 is_stmt 1 view .LVU80
+  40:touchscreen/ft6206.cpp ****         return false;
+ 292              		.loc 1 40 16 is_stmt 0 view .LVU81
+ 293 00e8 0020     		movs	r0, #0
+ 294              		.loc 1 57 1 view .LVU82
+ 295 00ea 04B0     		add	sp, sp, #16
+ 296              		.cfi_def_cfa_offset 32
+ 297              		@ sp needed
+ 298 00ec BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 299              	.LVL21:
+ 300              	.L21:
+ 301              		.loc 1 57 1 view .LVU83
+ 302              		.align	2
+ 303              	.L20:
+ 304 00f0 00000000 		.word	gpio_irq
+ 305 00f4 00000000 		.word	.LANCHOR0
+ 306 00f8 00000000 		.word	i2c_handle
+ 307 00fc 00000000 		.word	.LANCHOR1
+ 308 0100 C081FAFF 		.word	-360000
+ 309 0104 27072E8E 		.word	-1909586137
+ 310 0108 55C78913 		.word	327796565
+ARM GAS  /var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s 			page 8
+
+
+ 311 010c 0001F0FF 		.word	-1048320
+ 312              		.cfi_endproc
+ 313              	.LFE4483:
+ 315              		.section	.rodata._ZZ26FT6206_TouchGetCoordinatesPtS_E10cmd_read_x,"a"
+ 316              		.align	2
+ 317              		.set	.LANCHOR1,. + 0
+ 320              	_ZZ26FT6206_TouchGetCoordinatesPtS_E10cmd_read_x:
+ 321 0000 D0       		.ascii	"\320"
+ 322              		.section	.rodata._ZZ26FT6206_TouchGetCoordinatesPtS_E10cmd_read_y,"a"
+ 323              		.align	2
+ 324              		.set	.LANCHOR0,. + 0
+ 327              	_ZZ26FT6206_TouchGetCoordinatesPtS_E10cmd_read_y:
+ 328 0000 90       		.ascii	"\220"
+ 329              		.text
+ 330              	.Letext0:
+ 331              		.file 2 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/machine/_default_types.h"
+ 332              		.file 3 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/sys/_stdint.h"
+ 333              		.file 4 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/stdint.h"
+ 334              		.file 5 "/Library/DaisyToolchain/0.2.0/arm/lib/gcc/arm-none-eabi/10.3.1/include/stddef.h"
+ 335              		.file 6 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cmath"
+ 336              		.file 7 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/type_traits"
+ 337              		.file 8 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/debug/debug.h"
+ 338              		.file 9 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h"
+ 339              		.file 10 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cstdlib"
+ 340              		.file 11 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cstdint"
+ 341              		.file 12 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/arm-none-eabi/thumb/v
+ 342              		.file 13 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/algorithmfwd.h"
+ 343              		.file 14 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/exception_ptr.h"
+ 344              		.file 15 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/stl_iterator.h"
+ 345              		.file 16 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/functional"
+ 346              		.file 17 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cstdarg"
+ 347              		.file 18 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cstdio"
+ 348              		.file 19 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cstring"
+ 349              		.file 20 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/cwchar"
+ 350              		.file 21 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/string_view"
+ 351              		.file 22 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/bits/predefined_ops.h
+ 352              		.file 23 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/sys/_types.h"
+ 353              		.file 24 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/sys/reent.h"
+ 354              		.file 25 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/sys/lock.h"
+ 355              		.file 26 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/math.h"
+ 356              		.file 27 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/stdlib.h"
+ 357              		.file 28 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/math.h"
+ 358              		.file 29 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/stdlib.h"
+ 359              		.file 30 "../../DaisySeed/DaisyExamples/libDaisy/src/daisy_core.h"
+ 360              		.file 31 "../../DaisySeed/DaisyExamples/libDaisy/src/per/gpio.h"
+ 361              		.file 32 "../../DaisySeed/DaisyExamples/libDaisy/src/per/i2c.h"
+ 362              		.file 33 "../../DaisySeed/DaisyExamples/libDaisy/src/util/wav_format.h"
+ 363              		.file 34 "../../DaisySeed/DaisyExamples/libDaisy/src/dev/max11300.h"
+ 364              		.file 35 "../../DaisySeed/DaisyExamples/libDaisy/src/daisy_seed.h"
+ 365              		.file 36 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/c++/10.3.1/pstl/execution_defs.h
+ 366              		.file 37 "/Library/DaisyToolchain/0.2.0/arm/lib/gcc/arm-none-eabi/10.3.1/include/stdarg.h"
+ 367              		.file 38 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/stdio.h"
+ 368              		.file 39 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/string.h"
+ 369              		.file 40 "/Library/DaisyToolchain/0.2.0/arm/arm-none-eabi/include/wchar.h"
+ 370              		.file 41 "touchscreen/ft6206.hpp"
+ 371              		.file 42 "../../DaisySeed/DaisyExamples/libDaisy/src/dev/sr_595.h"
+ 372              		.file 43 "<built-in>"
+ARM GAS  /var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s 			page 9
+
+
+ARM GAS  /var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 ft6206.cpp
+/var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s:19     .text._Z17FT6206_Is_Pressedv:0000000000000000 $t
+/var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s:26     .text._Z17FT6206_Is_Pressedv:0000000000000000 _Z17FT6206_Is_Pressedv
+/var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s:51     .text._Z17FT6206_Is_Pressedv:0000000000000010 $d
+/var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s:56     .text._Z26FT6206_TouchGetCoordinatesPtS_:0000000000000000 $t
+/var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s:63     .text._Z26FT6206_TouchGetCoordinatesPtS_:0000000000000000 _Z26FT6206_TouchGetCoordinatesPtS_
+/var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s:304    .text._Z26FT6206_TouchGetCoordinatesPtS_:00000000000000f0 $d
+/var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s:316    .rodata._ZZ26FT6206_TouchGetCoordinatesPtS_E10cmd_read_x:0000000000000000 $d
+/var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s:320    .rodata._ZZ26FT6206_TouchGetCoordinatesPtS_E10cmd_read_x:0000000000000000 _ZZ26FT6206_TouchGetCoordinatesPtS_E10cmd_read_x
+/var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s:323    .rodata._ZZ26FT6206_TouchGetCoordinatesPtS_E10cmd_read_y:0000000000000000 $d
+/var/folders/0b/4qn_4lxx65nfvy4wf60ckd5w0000gn/T//ccsc0SPw.s:327    .rodata._ZZ26FT6206_TouchGetCoordinatesPtS_E10cmd_read_y:0000000000000000 _ZZ26FT6206_TouchGetCoordinatesPtS_E10cmd_read_y
+
+UNDEFINED SYMBOLS
+_ZN5daisy4GPIO4ReadEv
+gpio_irq
+_ZN5daisy9I2CHandle16TransmitBlockingEtPhtm
+_ZN5daisy9I2CHandle15ReceiveBlockingEtPhtm
+i2c_handle

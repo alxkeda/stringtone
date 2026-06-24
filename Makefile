@@ -1,9 +1,9 @@
-TARGET = ILI9341
-CPP_SOURCES = main.cpp adafruit_tft/ili9341.cpp
-C_SOURCES = adafruit_tft/fonts.c
+TARGET = STRINGTONE
+CPP_SOURCES = main.cpp touchscreen/ili9341.cpp touchscreen/ft6206.cpp
+C_SOURCES = touchscreen/fonts.c
 
-C_INCLUDES += -Iadafruit_tft
-CPP_INCLUDEES += -Iadafruit_tft
+C_INCLUDES += -Itouchscreen
+CPP_INCLUDEES += -Itouchscreen
 
 LIBDAISY_DIR = ../../DaisySeed/DaisyExamples/libDaisy
 DAISYSP_DIR  = ../../DaisySeed/DaisyExamples/DaisySP

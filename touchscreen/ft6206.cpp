@@ -1,13 +1,13 @@
-/* vim: set ai et ts=4 sw=4: */
+// TODO:    Replace all memory addresses with macros describing the memory address
+//          Change nsamples to a macro in the header 
 
-#include "stm32h7xx_hal.h"
 #include "ft6206.hpp"
 
 #define READ_X 0xD0
 #define READ_Y 0x90
 
-bool FT6206_TouchPressed() {
-    return HAL_GPIO_ReadPin(FT6206_IRQ_GPIO_Port, FT6206_IRQ_Pin) == GPIO_PIN_RESET;
+bool FT6206_Is_Pressed() {
+    return gpio_irq.Read() == false;
 }
 
 bool FT6206_TouchGetCoordinates(uint16_t* x, uint16_t* y) {
@@ -19,18 +19,18 @@ bool FT6206_TouchGetCoordinates(uint16_t* x, uint16_t* y) {
     uint32_t avg_y = 0;
     uint8_t nsamples = 0;
     for(uint8_t i = 0; i < 16; i++) {
-        if(!FT6206_TouchPressed())
+        if(!FT6206_Is_Pressed())
             break;
 
         nsamples++;
 
-        HAL_I2C_Master_Transmit(&ILI9341_TOUCH_I2C_PORT, ILI9341_TOUCH_ADDR, (uint8_t*)cmd_read_y, sizeof(cmd_read_y), HAL_MAX_DELAY);
+        i2c_handle.TransmitBlocking(FT6206_ADDR, (uint8_t*)cmd_read_y, sizeof(cmd_read_y), FT6206_TIMEOUT);
         uint8_t y_raw[2];
-        HAL_I2C_Master_Receive(&ILI9341_TOUCH_I2C_PORT, ILI9341_TOUCH_ADDR, y_raw, sizeof(y_raw), HAL_MAX_DELAY);
+        i2c_handle.ReceiveBlocking(FT6206_ADDR, y_raw, sizeof(y_raw), FT6206_TIMEOUT);
 
-        HAL_I2C_Master_Transmit(&ILI9341_TOUCH_I2C_PORT, ILI9341_TOUCH_ADDR, (uint8_t*)cmd_read_x, sizeof(cmd_read_x), HAL_MAX_DELAY);
+        i2c_handle.TransmitBlocking(FT6206_ADDR, (uint8_t*)cmd_read_x, sizeof(cmd_read_x), FT6206_TIMEOUT);
         uint8_t x_raw[2];
-        HAL_I2C_Master_Receive(&ILI9341_TOUCH_I2C_PORT, ILI9341_TOUCH_ADDR, x_raw, sizeof(x_raw), HAL_MAX_DELAY);
+        i2c_handle.ReceiveBlocking(FT6206_ADDR, x_raw, sizeof(x_raw), FT6206_TIMEOUT);
 
         avg_x += (((uint16_t)x_raw[0]) << 8) | ((uint16_t)x_raw[1]);
         avg_y += (((uint16_t)y_raw[0]) << 8) | ((uint16_t)y_raw[1]);

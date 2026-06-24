@@ -1,4 +1,4 @@
-build/fonts.o: adafruit_tft/fonts.c \
+build/fonts.o: touchscreen/fonts.c \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Include/core_cm7.h \
@@ -93,7 +93,7 @@ build/fonts.o: adafruit_tft/fonts.c \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_hcd.h \
- adafruit_tft/fonts.h
+ touchscreen/fonts.h
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h:
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h:
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Include/core_cm7.h:
@@ -188,4 +188,4 @@ build/fonts.o: adafruit_tft/fonts.c \
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h:
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h:
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_hcd.h:
-adafruit_tft/fonts.h:
+touchscreen/fonts.h:

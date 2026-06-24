@@ -1,4 +1,4 @@
-build/ili9341.o: touchscreen/ili9341.cpp \
+build/ft6206.o: touchscreen/ft6206.cpp \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h750xx.h \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/CMSIS/Include/core_cm7.h \
@@ -93,7 +93,7 @@ build/ili9341.o: touchscreen/ili9341.cpp \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h \
  ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_hcd.h \
- touchscreen/ili9341.hpp touchscreen/fonts.h \
+ touchscreen/ft6206.hpp \
  ../../DaisySeed/DaisyExamples/libDaisy/src/daisy_seed.h \
  ../../DaisySeed/DaisyExamples/libDaisy/src/daisy.h \
  ../../DaisySeed/DaisyExamples/libDaisy/src/daisy_core.h \
@@ -274,8 +274,7 @@ build/ili9341.o: touchscreen/ili9341.cpp \
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h:
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h:
 ../../DaisySeed/DaisyExamples/libDaisy/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_hcd.h:
-touchscreen/ili9341.hpp:
-touchscreen/fonts.h:
+touchscreen/ft6206.hpp:
 ../../DaisySeed/DaisyExamples/libDaisy/src/daisy_seed.h:
 ../../DaisySeed/DaisyExamples/libDaisy/src/daisy.h:
 ../../DaisySeed/DaisyExamples/libDaisy/src/daisy_core.h:

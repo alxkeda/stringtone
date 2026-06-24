@@ -1,5 +1,6 @@
-/* vim: set ai et ts=4 sw=4: */
-#include "stm32h7xx_hal.h"
+// TODO:    Replace all memory addresses with macros describing the memory address
+//          Rename all "Raw" writes to inherit the non-Raw names; rename all non-Raw names to inherit a "xxxx_Single" name (because it writes a single while asserting/unasserting CS) 
+
 #include "ili9341.hpp"
 
 void ILI9341_Select() {

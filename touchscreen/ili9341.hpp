@@ -1,9 +1,9 @@
-/* vim: set ai et ts=4 sw=4: */
+// TODO: Replace the fonts.h with DaisySeed FontDef or make custom fonts!
+
 #ifndef __ILI9341_HPP__
 #define __ILI9341_HPP__
 
 #include "fonts.h"
-#include <stdbool.h>
 
 #include "daisy_seed.h"
 #include "per/spi.h"
@@ -19,18 +19,13 @@ using namespace daisy;
 #define ILI9341_MADCTL_MH  0x04
 
 extern DaisySeed hw;
-extern SpiHandle spi_handle;
+
+// NOTE: SPI CLK, MISO, MOSI pins are defined by the SpiHandle::Config type passed into the initialization of the SPI device
 extern GPIO gpio_dc;
 extern GPIO gpio_res;
 extern GPIO gpio_cs;
 
-// Note:    pin 9; D8; SPI1 SCK; SPI1_SCK; PG11
-//          pin 10; D9; SPI1 MISO; SPI1_MISO; PB4
-//          pin 11; D10; SPI1 MOSI; SPI1_MOSI; PB5
-
-#define ILI9341_DC_Pin          gpio_dc     // pin 6; D5
-#define ILI9341_RES_Pin         gpio_res    // pin 7; D6
-#define ILI9341_CS_Pin          gpio_cs     // pin 8; D7
+extern SpiHandle spi_handle;
 
 // default orientation
 #define ILI9341_WIDTH  240
